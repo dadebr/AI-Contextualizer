@@ -99,6 +99,17 @@ export function ContextualizerUi() {
     }
   }
 
+  const handleInject = () => {
+    if (modalContent.result) {
+      setText(modalContent.result);
+      setModalOpen(false);
+      toast({
+        title: "Text Injected",
+        description: "The AI result has been placed in the text area.",
+      });
+    }
+  };
+
   return (
     <>
       <div className="flex flex-col min-h-screen bg-background font-body">
@@ -239,9 +250,18 @@ export function ContextualizerUi() {
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="max-h-[300px] overflow-y-auto p-4 bg-muted rounded-lg relative group">
-                <Button size="icon" variant="ghost" className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity" onClick={handleCopy} aria-label="Copy result to clipboard"><Copy className="h-4 w-4"/></Button>
+              <div className="max-h-[300px] overflow-y-auto p-4 bg-muted rounded-lg">
                 <p className="whitespace-pre-wrap text-foreground/90">{modalContent.result}</p>
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button size="sm" variant="outline" onClick={handleCopy}>
+                  <Copy className="mr-2" />
+                  Copiar
+                </Button>
+                <Button size="sm" onClick={handleInject}>
+                  <Sparkles className="mr-2" />
+                  Injetar no Editor
+                </Button>
               </div>
               <Accordion type="single" collapsible>
                 <AccordionItem value="item-1">
