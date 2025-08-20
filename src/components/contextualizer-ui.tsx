@@ -89,6 +89,16 @@ export function ContextualizerUi() {
     };
     window.addEventListener('message', handleMessage);
 
+    // This is for the chrome extension's context menu click
+    if (chrome && chrome.runtime && chrome.runtime.onMessage) {
+        chrome.runtime.onMessage.addListener((request) => {
+            if (request.action && request.text) {
+                const title = getActionTitle(request.action as AiAction);
+                handleAction(request.action as AiAction, title, request.text);
+            }
+        });
+    }
+
     return () => {
       window.removeEventListener('message', handleMessage);
     };
@@ -164,6 +174,7 @@ export function ContextualizerUi() {
   }
 
   // If in extension mode, and modal is not open, show nothing.
+  // This allows the page to act as the UI provider for the extension modal
   if (isExtension && !modalOpen) {
     return null;
   }

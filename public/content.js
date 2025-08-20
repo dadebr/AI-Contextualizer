@@ -1,68 +1,68 @@
 let iframe = null;
+let container = null;
 
-function createIframe() {
-    if (iframe) return;
+const ensureIframe = () => {
+    if (document.getElementById('gemini-contextualizer-iframe')) {
+        iframe = document.getElementById('gemini-contextualizer-iframe');
+        return;
+    }
 
+    container = document.createElement('div');
+    container.id = 'gemini-contextualizer-container';
+    
     iframe = document.createElement('iframe');
-    iframe.src = chrome.runtime.getURL('index.html');
-    iframe.style.position = 'fixed';
-    iframe.style.top = '20px';
-    iframe.style.right = '20px';
-    iframe.style.width = '0px'; // Initially hidden
-    iframe.style.height = '0px'; // Initially hidden
-    iframe.style.zIndex = '9999999';
-    iframe.style.border = 'none';
-    iframe.style.backgroundColor = 'transparent';
-    iframe.style.transition = 'width 0.3s ease, height 0.3s ease';
-    iframe.allow = 'clipboard-write';
+    iframe.src = chrome.runtime.getURL("index.html");
+    iframe.id = "gemini-contextualizer-iframe";
+    iframe.style.width = "400px";
+    iframe.style.height = "500px";
+    iframe.style.border = "1px solid #ccc";
+    iframe.style.borderRadius = "8px";
+    iframe.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
+    iframe.style.position = "fixed";
+    iframe.style.top = "20px";
+    iframe.style.right = "20px";
+    iframe.style.zIndex = "10000";
+    iframe.style.display = "none"; // Initially hidden
+    
+    container.appendChild(iframe);
+    document.body.appendChild(container);
 
-    document.body.appendChild(iframe);
-
-    // Close iframe if clicked outside
-    window.addEventListener('click', (event) => {
-        if (iframe && iframe.style.width !== '0px' && !iframe.contains(event.target)) {
-            closeIframe();
+     // Listen for messages from the iframe's parent (background script) to close it
+    window.addEventListener('message', (event) => {
+        if (event.data.type === 'CLOSE_MODAL') {
+             if (iframe) {
+                iframe.style.display = 'none';
+             }
         }
-    }, true);
-}
+    });
+};
 
-
-function openIframe() {
-    if (!iframe) createIframe();
-    // Use a timeout to ensure the iframe is rendered before we resize it
-    setTimeout(() => {
-        iframe.style.width = 'min(90vw, 725px)';
-        iframe.style.height = 'min(90vh, 750px)';
-        iframe.style.boxShadow = '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)';
-        iframe.style.borderRadius = '0.5rem';
-    }, 10);
-}
-
-function closeIframe() {
-    if (iframe) {
-        iframe.style.width = '0px';
-        iframe.style.height = '0px';
-        iframe.style.boxShadow = 'none';
-    }
-}
-
-
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.type === "GEMINI_ACTION") {
-        if (!iframe || iframe.style.width === '0px') {
-            openIframe();
+// This listener handles messages from the background script
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.type === "GEMINI_ACTION_START") {
+        ensureIframe();
+        if (iframe) {
+            iframe.style.display = 'block'; // Show the iframe
+            // Wait for the iframe to load before sending the message
+            iframe.onload = () => {
+                iframe.contentWindow.postMessage({
+                    type: "GEMINI_ACTION_START",
+                    action: request.action,
+                    text: request.text
+                }, '*');
+            };
+            // If already loaded, just send
+            if (iframe.contentWindow) {
+                 iframe.contentWindow.postMessage({
+                    type: "GEMINI_ACTION_START",
+                    action: request.action,
+                    text: request.text
+                }, '*');
+            }
         }
-        // Use a timeout to ensure iframe is visible before sending the message
-        setTimeout(() => {
-            iframe.contentWindow.postMessage({
-                type: 'GEMINI_ACTION_START',
-                action: message.action,
-                text: message.text,
-            }, '*');
-        }, 100);
-    } else if (message.type === "CLOSE_MODAL") {
-        closeIframe();
     }
+    return true; // Indicates that the response is asynchronous
 });
 
-createIframe();
+// Initial check
+ensureIframe();
