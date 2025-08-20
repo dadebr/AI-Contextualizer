@@ -5,8 +5,11 @@ import { translateText } from '@/ai/flows/translate-text';
 import { reviewText } from '@/ai/flows/review-text';
 import { summarizeText } from '@/ai/flows/summarize-text';
 import { deepenText } from '@/ai/flows/deepen-text';
+import { explainText } from '@/ai/flows/explain-text';
+import { teachHowToUseText } from '@/ai/flows/teach-how-to-use-text';
+import { generatePrompt } from '@/ai/flows/generate-prompt';
 
-export type AiAction = 'rewrite' | 'translate' | 'review' | 'summarize' | 'deepen';
+export type AiAction = 'rewrite' | 'translate' | 'review' | 'summarize' | 'deepen' | 'explain' | 'teach' | 'generatePrompt';
 
 export async function performAiAction(
   action: AiAction,
@@ -30,6 +33,15 @@ export async function performAiAction(
       case 'deepen':
         const deepenResult = await deepenText({ text });
         return { result: deepenResult.deepenedText };
+      case 'explain':
+        const explainResult = await explainText({ text });
+        return { result: explainResult.explanation };
+      case 'teach':
+        const teachResult = await teachHowToUseText({ text });
+        return { result: teachResult.instructions };
+      case 'generatePrompt':
+        const generatePromptResult = await generatePrompt({ text });
+        return { result: generatePromptResult.generatedPrompt };
       default:
         // This is a type error, should not happen at runtime
         throw new Error('Invalid AI action');

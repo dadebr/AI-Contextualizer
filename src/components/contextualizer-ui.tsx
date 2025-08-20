@@ -14,10 +14,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 
-import { Bot, Combine, Languages, SpellCheck, BookText, Copy, AlertTriangle, KeyRound, Loader2, Sparkles, ChevronDown, Search } from 'lucide-react';
+import { Bot, Combine, Languages, SpellCheck, BookText, Copy, AlertTriangle, KeyRound, Loader2, Sparkles, ChevronDown, Search, GraduationCap, Code, FileCode } from 'lucide-react';
 
 import { performAiAction, type AiAction } from '@/app/actions';
 
@@ -212,17 +212,30 @@ export function ContextualizerUi() {
                         <SpellCheck className="w-4 h-4 mr-2" />
                         Revisar
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleAction('translate', 'Traduzir Texto')}>
-                        <Languages className="w-4 h-4 mr-2" />
-                        Traduzir
+                       <DropdownMenuItem onClick={() => handleAction('deepen', 'Aprofundar Texto')}>
+                        <Search className="w-4 h-4 mr-2" />
+                        Aprofundar
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleAction('summarize', 'Resumir Texto')}>
                         <BookText className="w-4 h-4 mr-2" />
                         Resumir
                       </DropdownMenuItem>
-                       <DropdownMenuItem onClick={() => handleAction('deepen', 'Aprofundar Texto')}>
-                        <Search className="w-4 h-4 mr-2" />
-                        Aprofundar
+                      <DropdownMenuItem onClick={() => handleAction('translate', 'Traduzir Texto')}>
+                        <Languages className="w-4 h-4 mr-2" />
+                        Traduzir
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => handleAction('explain', 'Explicar Texto')}>
+                        <GraduationCap className="w-4 h-4 mr-2" />
+                        Explicar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleAction('teach', 'Ensinar a Usar')}>
+                        <Code className="w-4 h-4 mr-2" />
+                        Ensinar a Usar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleAction('generatePrompt', 'Gerador de Prompt')}>
+                        <FileCode className="w-4 h-4 mr-2" />
+                        Gerador de Prompt
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
