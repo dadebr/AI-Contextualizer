@@ -28,7 +28,7 @@ const prompt = ai.definePrompt({
   name: 'reviewTextPrompt',
   input: {schema: ReviewTextInputSchema},
   output: {schema: ReviewTextOutputSchema},
-  prompt: `Por favor, revise o seguinte texto em busca de erros gramaticais e ortográficos e forneça uma versão corrigida:\n\n{{{text}}}`,
+  prompt: `Você é um assistente de IA. Sua tarefa é fazer melhorias pontuais e correções no texto a seguir:\n\n{{{text}}}`,
 });
 
 const reviewTextFlow = ai.defineFlow(

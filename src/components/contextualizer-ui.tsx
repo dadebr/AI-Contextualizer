@@ -17,7 +17,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 
-import { Bot, Combine, Languages, SpellCheck, BookText, Copy, AlertTriangle, KeyRound, Loader2, Sparkles, ChevronDown } from 'lucide-react';
+import { Bot, Combine, Languages, SpellCheck, BookText, Copy, AlertTriangle, KeyRound, Loader2, Sparkles, ChevronDown, Search } from 'lucide-react';
 
 import { performAiAction, type AiAction } from '@/app/actions';
 
@@ -193,21 +193,25 @@ export function ContextualizerUi() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                      <DropdownMenuItem onClick={() => handleAction('rewrite', 'Rewrite Text')}>
+                      <DropdownMenuItem onClick={() => handleAction('rewrite', 'Reescrever Texto')}>
                         <Combine className="w-4 h-4 mr-2" />
                         Reescrever
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleAction('translate', 'Translate Text')}>
-                        <Languages className="w-4 h-4 mr-2" />
-                        Traduzir
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleAction('review', 'Review Text')}>
+                      <DropdownMenuItem onClick={() => handleAction('review', 'Revisar Texto')}>
                         <SpellCheck className="w-4 h-4 mr-2" />
                         Revisar
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleAction('summarize', 'Summarize Text')}>
+                      <DropdownMenuItem onClick={() => handleAction('translate', 'Traduzir Texto')}>
+                        <Languages className="w-4 h-4 mr-2" />
+                        Traduzir
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleAction('summarize', 'Resumir Texto')}>
                         <BookText className="w-4 h-4 mr-2" />
                         Resumir
+                      </DropdownMenuItem>
+                       <DropdownMenuItem onClick={() => handleAction('deepen', 'Aprofundar Texto')}>
+                        <Search className="w-4 h-4 mr-2" />
+                        Aprofundar
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

@@ -4,8 +4,9 @@ import { rewriteText } from '@/ai/flows/rewrite-text';
 import { translateText } from '@/ai/flows/translate-text';
 import { reviewText } from '@/ai/flows/review-text';
 import { summarizeText } from '@/ai/flows/summarize-text';
+import { deepenText } from '@/ai/flows/deepen-text';
 
-export type AiAction = 'rewrite' | 'translate' | 'review' | 'summarize';
+export type AiAction = 'rewrite' | 'translate' | 'review' | 'summarize' | 'deepen';
 
 export async function performAiAction(
   action: AiAction,
@@ -18,8 +19,7 @@ export async function performAiAction(
         const rewriteResult = await rewriteText({ text });
         return { result: rewriteResult.rewrittenText };
       case 'translate':
-        const lang = targetLanguage === 'en-US' || targetLanguage === 'en' ? 'English' : 'Português (Brasil)';
-        const translateResult = await translateText({ text, targetLanguage: lang });
+        const translateResult = await translateText({ text, targetLanguage: 'English' });
         return { result: translateResult.translation };
       case 'review':
         const reviewResult = await reviewText({ text });
@@ -27,6 +27,9 @@ export async function performAiAction(
       case 'summarize':
         const summarizeResult = await summarizeText({ text });
         return { result: summarizeResult.summary };
+      case 'deepen':
+        const deepenResult = await deepenText({ text });
+        return { result: deepenResult.deepenedText };
       default:
         // This is a type error, should not happen at runtime
         throw new Error('Invalid AI action');

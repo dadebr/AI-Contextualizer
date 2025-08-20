@@ -29,7 +29,7 @@ const rewriteTextPrompt = ai.definePrompt({
   name: 'rewriteTextPrompt',
   input: {schema: RewriteTextInputSchema},
   output: {schema: RewriteTextOutputSchema},
-  prompt: `Reescreva o texto a seguir para melhorar sua clareza, tom ou estilo:\n\n{{text}}`,
+  prompt: `Você é um assistente de IA. Sua tarefa é refazer o texto a seguir de forma mais clara, objetiva e elegante:\n\n{{text}}`,
 });
 
 const rewriteTextFlow = ai.defineFlow(

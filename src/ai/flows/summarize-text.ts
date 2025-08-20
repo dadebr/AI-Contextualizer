@@ -29,7 +29,7 @@ const prompt = ai.definePrompt({
   name: 'summarizeTextPrompt',
   input: {schema: SummarizeTextInputSchema},
   output: {schema: SummarizeTextOutputSchema},
-  prompt: `Resuma o seguinte texto:\n\n{{text}}`,
+  prompt: `Você é um assistente de IA. Sua tarefa é fornecer um resumo "TL;DR" (Too Long; Didn't Read) do seguinte texto:\n\n{{text}}`,
 });
 
 const summarizeTextFlow = ai.defineFlow(

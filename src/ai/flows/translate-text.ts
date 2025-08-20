@@ -29,7 +29,7 @@ const prompt = ai.definePrompt({
   name: 'translateTextPrompt',
   input: {schema: TranslateTextInputSchema},
   output: {schema: TranslateTextOutputSchema},
-  prompt: `Traduza o seguinte texto para {{{targetLanguage}}}:\n\n{{{text}}}`,
+  prompt: `Você é um assistente de IA. Sua tarefa é traduzir o seguinte texto do português para o inglês:\n\n{{{text}}}`,
 });
 
 const translateTextFlow = ai.defineFlow(
