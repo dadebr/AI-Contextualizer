@@ -14,9 +14,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 
-import { Bot, Combine, Languages, SpellCheck, BookText, Copy, AlertTriangle, KeyRound, Loader2, Sparkles } from 'lucide-react';
+import { Bot, Combine, Languages, SpellCheck, BookText, Copy, AlertTriangle, KeyRound, Loader2, Sparkles, ChevronDown } from 'lucide-react';
 
 import { performAiAction, type AiAction } from '@/app/actions';
 
@@ -184,10 +185,32 @@ export function ContextualizerUi() {
                   />
                 </CardContent>
                 <CardFooter className="flex flex-wrap gap-2">
-                  <Button onClick={() => handleAction('rewrite', 'Rewrite Text')}><Combine /> Rewrite</Button>
-                  <Button onClick={() => handleAction('translate', 'Translate Text')}><Languages /> Translate</Button>
-                  <Button onClick={() => handleAction('review', 'Review Text')}><SpellCheck /> Review</Button>
-                  <Button onClick={() => handleAction('summarize', 'Summarize Text')}><BookText /> Summarize</Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button>
+                        Ações de IA
+                        <ChevronDown className="w-4 h-4 ml-2" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem onClick={() => handleAction('rewrite', 'Rewrite Text')}>
+                        <Combine className="w-4 h-4 mr-2" />
+                        Reescrever
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleAction('translate', 'Translate Text')}>
+                        <Languages className="w-4 h-4 mr-2" />
+                        Traduzir
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleAction('review', 'Review Text')}>
+                        <SpellCheck className="w-4 h-4 mr-2" />
+                        Revisar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleAction('summarize', 'Summarize Text')}>
+                        <BookText className="w-4 h-4 mr-2" />
+                        Resumir
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </CardFooter>
               </Card>
             </div>
