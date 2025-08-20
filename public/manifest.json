@@ -2,8 +2,15 @@
   "manifest_version": 3,
   "name": "Gemini Contextualizer",
   "version": "1.0",
-  "description": "An AI assistant to help you with your text-based tasks.",
-  "permissions": ["contextMenus", "storage"],
+  "description": "An AI assistant to help you with your text-based tasks, using Gemini.",
+  "permissions": [
+    "contextMenus",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
   "background": {
     "service_worker": "background.js"
   },
@@ -23,8 +30,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "all_frames": true
+      "js": ["content.js"]
     }
   ]
 }

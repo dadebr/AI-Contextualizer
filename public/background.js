@@ -1,82 +1,51 @@
-// Function to create context menus
-const createContextMenu = () => {
+// Copyright 2024 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+const AI_ACTIONS = [
+    { id: 'rewrite', title: 'Reescrever' },
+    { id: 'review', title: 'Revisar' },
+    { id: 'deepen', title: 'Aprofundar' },
+    { id: 'summarize', title: 'Resumir' },
+    { id: 'translate', title: 'Traduzir' },
+    { id: 'explain', title: 'Explicar' },
+    { id: 'teach', title: 'Ensinar a Usar' },
+    { id: 'generatePrompt', title: 'Gerador de Prompt' }
+];
+
+chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
-        id: "ai-assistant",
-        title: "AI Assistant",
-        contexts: ["selection"]
+        id: 'ai-assistant',
+        title: 'AI Assistant',
+        contexts: ['selection'],
     });
 
-    const actions = [
-        { id: 'rewrite', title: 'Reescrever' },
-        { id: 'review', title: 'Revisar' },
-        { id: 'deepen', title: 'Aprofundar' },
-        { id: 'summarize', title: 'Resumir' },
-        { id: 'translate', title: 'Traduzir' },
-        { id: 'explain', title: 'Explicar' },
-        { id: 'teach', title: 'Ensinar a Usar' },
-        { id: 'generatePrompt', title: 'Gerador de Prompt' }
-    ];
-
-    actions.forEach(action => {
+    AI_ACTIONS.forEach(action => {
         chrome.contextMenus.create({
             id: action.id,
+            parentId: 'ai-assistant',
             title: action.title,
-            parentId: "ai-assistant",
-            contexts: ["selection"]
+            contexts: ['selection'],
         });
     });
-};
-
-// Create menus when the extension is installed
-chrome.runtime.onInstalled.addListener(() => {
-    createContextMenu();
 });
 
-let iframe = null;
-let container = null;
-
-const createIframe = () => {
-    if (iframe) return;
-
-    container = document.createElement('div');
-    container.id = 'gemini-contextualizer-container';
-    document.body.appendChild(container);
-
-    iframe = document.createElement('iframe');
-    iframe.src = chrome.runtime.getURL("index.html");
-    iframe.id = "gemini-contextualizer-iframe";
-    iframe.style.width = "100%";
-    iframe.style.height = "100%";
-    iframe.style.border = "none";
-    iframe.style.position = "fixed";
-    iframe.style.top = "0";
-    iframe.style.left = "0";
-    iframe.style.zIndex = "99999";
-    iframe.style.display = "none"; // Initially hidden
-    container.appendChild(iframe);
-
-    // Listen for messages from the iframe to close it
-    window.addEventListener('message', (event) => {
-        if (event.source === iframe.contentWindow && event.data.type === 'CLOSE_MODAL') {
-             if (iframe) iframe.style.display = 'none';
-        }
-    });
-}
-
-// Handle context menu clicks
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-    const { menuItemId, selectionText } = info;
-    
-    // Inject the content script to create the iframe container if it doesn't exist
-    chrome.scripting.executeScript({
-        target: { tabId: tab.id, allFrames: true },
-        function: createIframe
-    }).then(() => {
-         // Now send the message to the content script
-         chrome.tabs.sendMessage(tab.id, {
-            type: "GEMINI_ACTION_START",
-            action: menuItemId,
-            text: selectionText
+    if (AI_ACTIONS.some(action => action.id === info.menuItemId)) {
+        chrome.tabs.sendMessage(tab.id, {
+            type: "GEMINI_ACTION_REQUEST",
+            action: info.menuItemId,
+            text: info.selectionText
         });
-    });
+    }
 });

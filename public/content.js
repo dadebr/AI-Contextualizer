@@ -1,68 +1,61 @@
-let iframe = null;
-let container = null;
+// Copyright 2024 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-const ensureIframe = () => {
-    if (document.getElementById('gemini-contextualizer-iframe')) {
-        iframe = document.getElementById('gemini-contextualizer-iframe');
+let iframe = null;
+
+function createIframe() {
+    if (iframe) return iframe;
+
+    iframe = document.createElement('iframe');
+    iframe.src = chrome.runtime.getURL('index.html');
+    iframe.style.position = 'fixed';
+    iframe.style.top = '20px';
+    iframe.style.right = '20px';
+    iframe.style.width = '400px';
+    iframe.style.height = '500px';
+    iframe.style.zIndex = '9999';
+    iframe.style.border = '1px solid #ccc';
+    iframe.style.borderRadius = '8px';
+    iframe.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+    iframe.style.display = 'none'; // Initially hidden
+    document.body.appendChild(iframe);
+    return iframe;
+}
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.type === "GEMINI_ACTION_REQUEST") {
+        const modal = createIframe();
+        modal.style.display = 'block';
+        modal.onload = () => {
+            modal.contentWindow.postMessage({
+                type: 'GEMINI_ACTION_START',
+                action: request.action,
+                text: request.text
+            }, '*');
+        };
+    }
+});
+
+window.addEventListener('message', (event) => {
+    // We only accept messages from ourselves
+    if (event.source !== window) {
         return;
     }
 
-    container = document.createElement('div');
-    container.id = 'gemini-contextualizer-container';
-    
-    iframe = document.createElement('iframe');
-    iframe.src = chrome.runtime.getURL("index.html");
-    iframe.id = "gemini-contextualizer-iframe";
-    iframe.style.width = "400px";
-    iframe.style.height = "500px";
-    iframe.style.border = "1px solid #ccc";
-    iframe.style.borderRadius = "8px";
-    iframe.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
-    iframe.style.position = "fixed";
-    iframe.style.top = "20px";
-    iframe.style.right = "20px";
-    iframe.style.zIndex = "10000";
-    iframe.style.display = "none"; // Initially hidden
-    
-    container.appendChild(iframe);
-    document.body.appendChild(container);
-
-     // Listen for messages from the iframe's parent (background script) to close it
-    window.addEventListener('message', (event) => {
-        if (event.data.type === 'CLOSE_MODAL') {
-             if (iframe) {
-                iframe.style.display = 'none';
-             }
-        }
-    });
-};
-
-// This listener handles messages from the background script
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.type === "GEMINI_ACTION_START") {
-        ensureIframe();
+    if (event.data.type === 'CLOSE_MODAL') {
         if (iframe) {
-            iframe.style.display = 'block'; // Show the iframe
-            // Wait for the iframe to load before sending the message
-            iframe.onload = () => {
-                iframe.contentWindow.postMessage({
-                    type: "GEMINI_ACTION_START",
-                    action: request.action,
-                    text: request.text
-                }, '*');
-            };
-            // If already loaded, just send
-            if (iframe.contentWindow) {
-                 iframe.contentWindow.postMessage({
-                    type: "GEMINI_ACTION_START",
-                    action: request.action,
-                    text: request.text
-                }, '*');
-            }
+            iframe.style.display = 'none';
         }
     }
-    return true; // Indicates that the response is asynchronous
 });
-
-// Initial check
-ensureIframe();

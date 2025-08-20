@@ -76,11 +76,14 @@ export function ContextualizerUi() {
 
   useEffect(() => {
     // Check if running in an iframe, which is how it will be used as an extension
-    if (window.self !== window.top) {
+    if (typeof window !== 'undefined' && window.self !== window.top) {
       setIsExtension(true);
     }
     
     const handleMessage = (event: MessageEvent) => {
+      // Basic security check
+      if (event.source !== window.parent) return;
+
       const { type, action, text } = event.data;
       if (type === 'GEMINI_ACTION_START') {
         const title = getActionTitle(action as AiAction);
@@ -88,16 +91,6 @@ export function ContextualizerUi() {
       }
     };
     window.addEventListener('message', handleMessage);
-
-    // This is for the chrome extension's context menu click
-    if (chrome && chrome.runtime && chrome.runtime.onMessage) {
-        chrome.runtime.onMessage.addListener((request) => {
-            if (request.action && request.text) {
-                const title = getActionTitle(request.action as AiAction);
-                handleAction(request.action as AiAction, title, request.text);
-            }
-        });
-    }
 
     return () => {
       window.removeEventListener('message', handleMessage);
