@@ -1,1 +1,7 @@
-// Flows will be imported for their side effects in this file.
+import { config } from 'dotenv';
+config();
+
+import '@/ai/flows/rewrite-text.ts';
+import '@/ai/flows/translate-text.ts';
+import '@/ai/flows/summarize-text.ts';
+import '@/ai/flows/review-text.ts';
