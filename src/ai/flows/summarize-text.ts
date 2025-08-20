@@ -29,7 +29,7 @@ const prompt = ai.definePrompt({
   name: 'summarizeTextPrompt',
   input: {schema: SummarizeTextInputSchema},
   output: {schema: SummarizeTextOutputSchema},
-  prompt: `Summarize the following text:\n\n{{text}}`,
+  prompt: `Resuma o seguinte texto:\n\n{{text}}`,
 });
 
 const summarizeTextFlow = ai.defineFlow(

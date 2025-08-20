@@ -18,10 +18,8 @@ export async function performAiAction(
         const rewriteResult = await rewriteText({ text });
         return { result: rewriteResult.rewrittenText };
       case 'translate':
-        if (!targetLanguage) {
-          throw new Error('Target language is required for translation.');
-        }
-        const translateResult = await translateText({ text, targetLanguage });
+        const lang = targetLanguage === 'en-US' || targetLanguage === 'en' ? 'English' : 'Português (Brasil)';
+        const translateResult = await translateText({ text, targetLanguage: lang });
         return { result: translateResult.translation };
       case 'review':
         const reviewResult = await reviewText({ text });
