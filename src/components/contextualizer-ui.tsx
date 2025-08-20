@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -17,7 +17,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 
-import { Bot, Combine, Languages, SpellCheck, BookText, Copy, AlertTriangle, KeyRound, Loader2, Sparkles, ChevronDown, Search, GraduationCap, Code, FileCode } from 'lucide-react';
+import { Bot, Combine, Languages, SpellCheck, BookText, Copy, AlertTriangle, KeyRound, Loader2, Sparkles, ChevronDown, Search, GraduationCap, Code, FileCode, X } from 'lucide-react';
 
 import { performAiAction, type AiAction } from '@/app/actions';
 
@@ -34,11 +34,28 @@ const modelOptions = [
   'gemini-2.5-pro'
 ];
 
+// Helper to get action title
+const getActionTitle = (action: AiAction) => {
+  const titles: Record<AiAction, string> = {
+      'rewrite': 'Reescrever Texto',
+      'review': 'Revisar Texto',
+      'deepen': 'Aprofundar Texto',
+      'summarize': 'Resumir Texto',
+      'translate': 'Traduzir Texto',
+      'explain': 'Explicar Texto',
+      'teach': 'Ensinar a Usar',
+      'generatePrompt': 'Gerador de Prompt'
+  };
+  return titles[action];
+}
+
+
 export function ContextualizerUi() {
   const [text, setText] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({ title: '', original: '', result: '', error: '' });
   const [isPending, startTransition] = useTransition();
+  const [isExtension, setIsExtension] = useState(false);
 
   const { toast } = useToast();
 
@@ -53,9 +70,29 @@ export function ContextualizerUi() {
   });
   
   // Resync form if settings change in another tab
-  useState(() => {
+  useEffect(() => {
     form.reset(settings);
-  });
+  }, [settings, form]);
+
+  useEffect(() => {
+    // Check if running in an iframe, which is how it will be used as an extension
+    if (window.self !== window.top) {
+      setIsExtension(true);
+    }
+    
+    const handleMessage = (event: MessageEvent) => {
+      const { type, action, text } = event.data;
+      if (type === 'GEMINI_ACTION_START') {
+        const title = getActionTitle(action as AiAction);
+        handleAction(action as AiAction, title, text);
+      }
+    };
+    window.addEventListener('message', handleMessage);
+
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, []);
 
 
   function onSubmit(data: SettingsValues) {
@@ -66,8 +103,10 @@ export function ContextualizerUi() {
     });
   }
 
-  const handleAction = (action: AiAction, actionTitle: string) => {
-    if (!text.trim()) {
+  const handleAction = (action: AiAction, actionTitle: string, initialText?: string) => {
+    const textToProcess = initialText ?? text;
+
+    if (!textToProcess.trim()) {
       toast({
         variant: "destructive",
         title: "No Text Provided",
@@ -76,12 +115,12 @@ export function ContextualizerUi() {
       return;
     }
 
-    setModalContent({ title: actionTitle, original: text, result: '', error: '' });
+    setModalContent({ title: actionTitle, original: textToProcess, result: '', error: '' });
     setModalOpen(true);
 
     startTransition(async () => {
       const lang = typeof navigator !== 'undefined' ? navigator.language : 'en';
-      const response = await performAiAction(action, text, lang);
+      const response = await performAiAction(action, textToProcess, lang);
       if (response.error) {
         setModalContent(prev => ({ ...prev, error: response.error! }));
       } else {
@@ -92,9 +131,16 @@ export function ContextualizerUi() {
 
   const handleCopy = () => {
     if(modalContent.result) {
-      navigator.clipboard.writeText(modalContent.result);
-      toast({
-        title: "Copied to Clipboard",
+      navigator.clipboard.writeText(modalContent.result).then(() => {
+        toast({
+          title: "Copied to Clipboard",
+        });
+      }).catch(err => {
+        toast({
+            variant: "destructive",
+            title: "Failed to Copy",
+            description: "Could not copy text to clipboard.",
+        });
       });
     }
   }
@@ -109,6 +155,69 @@ export function ContextualizerUi() {
       });
     }
   };
+  
+  const closeModal = () => {
+    setModalOpen(false);
+    if(isExtension) {
+        window.parent.postMessage({ type: 'CLOSE_MODAL' }, '*');
+    }
+  }
+
+  // If in extension mode, and modal is not open, show nothing.
+  if (isExtension && !modalOpen) {
+    return null;
+  }
+  
+  // If in extension mode, and modal is open, show only the modal.
+  if (isExtension && modalOpen) {
+     return (
+        <Dialog open={modalOpen} onOpenChange={closeModal}>
+        <DialogContent className="sm:max-w-[625px] h-auto max-h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-primary flex items-center gap-2">{modalContent.title}</DialogTitle>
+          </DialogHeader>
+          <div className="flex-grow overflow-y-auto pr-6">
+          {isPending ? (
+            <div className="flex flex-col items-center justify-center p-8 gap-4 text-muted-foreground">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <span>Processing with Gemini...</span>
+            </div>
+          ) : modalContent.error ? (
+            <div className="bg-destructive/10 border border-destructive/20 text-destructive p-4 rounded-lg space-y-2">
+                <h3 className="font-bold flex items-center gap-2"><AlertTriangle /> Error Occurred</h3>
+                <p className="text-sm">{modalContent.error}</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="max-h-[300px] overflow-y-auto p-4 bg-muted rounded-lg">
+                <p className="whitespace-pre-wrap text-foreground/90">{modalContent.result}</p>
+              </div>
+              <Accordion type="single" collapsible>
+                <AccordionItem value="item-1">
+                  <AccordionTrigger>Show Original Text</AccordionTrigger>
+                  <AccordionContent>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">{modalContent.original}</p>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
+          )}
+          </div>
+          <DialogFooter className="mt-auto pt-4 border-t">
+            {!isPending && !modalContent.error && (
+                 <div className="flex gap-2 justify-end w-full">
+                    <Button size="sm" variant="outline" onClick={handleCopy}>
+                      <Copy className="mr-2" />
+                      Copiar
+                    </Button>
+                  </div>
+            )}
+            <Button variant="outline" onClick={closeModal}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+     )
+  }
 
   return (
     <>
@@ -170,7 +279,7 @@ export function ContextualizerUi() {
                       />
                        <div className="text-xs text-muted-foreground p-3 bg-muted rounded-lg flex items-start gap-2.5">
                         <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5 text-foreground/60" />
-                        <span>For this demo, the API key is saved to local storage but not used for API calls. The backend uses a pre-configured key from environment variables.</span>
+                        <span>The API key is securely stored in your browser's local storage. Your key is required for the extension to make calls to the Google AI API.</span>
                        </div>
                     </CardContent>
                     <CardFooter>
@@ -246,7 +355,7 @@ export function ContextualizerUi() {
         </main>
       </div>
 
-      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+      <Dialog open={modalOpen && !isExtension} onOpenChange={setModalOpen}>
         <DialogContent className="sm:max-w-[625px]">
           <DialogHeader>
             <DialogTitle className="text-primary flex items-center gap-2">{modalContent.title}</DialogTitle>

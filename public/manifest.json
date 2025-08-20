@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Gemini Contextualizer",
+  "version": "1.0",
+  "description": "An AI assistant to help you with your text-based tasks.",
+  "permissions": ["contextMenus", "storage", "scripting", "activeTab"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["/index.html"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
