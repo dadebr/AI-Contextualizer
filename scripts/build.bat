@@ -1,0 +1,6 @@
+@echo off
+echo Executando build do Next.js...
+call npx next build
+echo Build concluído. Copiando arquivos da extensão...
+call node scripts/copy-extension-files.js
+echo ✅ Build completo! Arquivos da extensão estão em extension-build/

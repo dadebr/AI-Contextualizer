@@ -18,8 +18,23 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  output: 'export',
-  distDir: 'out',
+
+  webpack: (config, { webpack, isServer }) => {
+    // Resolver problemas com handlebars e require.extensions
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      path: false,
+    };
+
+    // Ignorar avisos do handlebars
+    config.externals = config.externals || [];
+    config.externals.push({
+      handlebars: 'handlebars'
+    });
+
+    return config;
+  },
 };
 
 export default nextConfig;

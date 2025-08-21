@@ -814,6 +814,19 @@ function hideLoading() {
     if (result) result.style.display = 'block';
 }
 
+function loadCurrentModel() {
+    chrome.storage.sync.get(['model'], function(result) {
+        const model = result.model || 'gemini-2.5-flash';
+        const modelIndicator = sidebar.querySelector('#modelIndicator');
+        if (modelIndicator) {
+            // Formatar o nome do modelo para exibição
+            const modelDisplay = model.replace('gemini-', 'Gemini ').replace('-', ' ');
+            modelIndicator.textContent = modelDisplay;
+            modelIndicator.title = `Modelo atual: ${model}`;
+        }
+    });
+}
+
 // Mapeamento das ações para prompts profissionais seguindo as especificações
 const ACTION_PROMPTS = {
     'rewrite': `Reescreva o texto abaixo preservando o sentido original, melhorando clareza e fluidez. Mantenha formatação básica como listas e links.
@@ -1081,19 +1094,6 @@ function processAction(action, text) {
                 '2. O modelo selecionado está disponível\n' +
                 '3. Não há problemas de conectividade';
         });
-}
-
-function loadCurrentModel() {
-    chrome.storage.sync.get(['model'], function(result) {
-        const model = result.model || 'gemini-2.5-flash';
-        const modelIndicator = sidebar.querySelector('#modelIndicator');
-        if (modelIndicator) {
-            // Formatar o nome do modelo para exibição
-            const modelDisplay = model.replace('gemini-', 'Gemini ').replace('-', ' ');
-            modelIndicator.textContent = modelDisplay;
-            modelIndicator.title = `Modelo atual: ${model}`;
-        }
-    });
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

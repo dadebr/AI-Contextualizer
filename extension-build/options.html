@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - AI Contextualizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a237e;
+            color: #ffffff;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, #3949ab 0%, #1e88e5 100%);
+            padding: 40px 20px;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .logo {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #e3f2fd;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #283593 0%, #1976d2 100%);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            font-size: 14px;
+            background: rgba(255,255,255,0.1);
+            color: #ffffff;
+            transition: all 0.2s;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #90caf9;
+            box-shadow: 0 0 0 3px rgba(144,202,249,0.2);
+            background: rgba(255,255,255,0.15);
+        }
+
+        .form-group select option {
+            background: #283593;
+            color: #ffffff;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #e3f2fd;
+            margin-top: 4px;
+        }
+
+        .help-text a {
+            color: #90caf9;
+            text-decoration: none;
+        }
+
+        .help-text a:hover {
+            color: #ffffff;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(66,165,245,0.3);
+        }
+
+        .button:hover {
+            background: linear-gradient(135deg, #64b5f6 0%, #1565c0 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(66,165,245,0.4);
+        }
+
+        .button:disabled {
+            background: rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.6);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .success-message {
+            background: rgba(76,175,80,0.2);
+            color: #c8e6c9;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 16px;
+            border: 1px solid rgba(76,175,80,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .error-message {
+            background: rgba(244,67,54,0.2);
+            color: #ffcdd2;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 16px;
+            border: 1px solid rgba(244,67,54,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .model-info {
+            background: rgba(255,255,255,0.1);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .model-info h4 {
+            margin-bottom: 8px;
+            color: #90caf9;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .model-info ul {
+            margin-left: 20px;
+        }
+
+        .model-info li {
+            margin: 4px 0;
+            color: #e3f2fd;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="icon48.png" alt="AI Contextualizer" class="logo">
+            <h1 class="title">AI Contextualizer</h1>
+            <p class="subtitle">Configure sua extensão de assistente de IA</p>
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">Configurações da API</h3>
+
+            <div class="form-group">
+                <label for="apiKey">Chave da API do Google AI</label>
+                <input type="password" id="apiKey" placeholder="Digite sua chave da API">
+                <div class="help-text">
+                    Obtenha sua chave em <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="model">Modelo de IA</label>
+                <select id="model">
+                    <option value="gemini-2.5-flash">Gemini 2.5 Flash (Recomendado)</option>
+                    <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                    <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
+                    <option value="gemini-2.0-flash">Gemini 2.0 Flash (Legacy)</option>
+                    <option value="gemini-1.5-flash">Gemini 1.5 Flash (Legacy)</option>
+                </select>
+                <div class="help-text">
+                    Gemini 2.5 Flash é o mais rápido e eficiente para a maioria das tarefas
+                </div>
+            </div>
+
+            <div class="model-info">
+                <h4>ℹ️ Sobre os Modelos</h4>
+                <ul>
+                    <li><strong>Gemini 2.5 Flash:</strong> Mais rápido, otimizado para tarefas gerais</li>
+                    <li><strong>Gemini 2.5 Pro:</strong> Melhor qualidade e raciocínio avançado</li>
+                    <li><strong>Gemini 2.5 Flash Lite:</strong> Versão mais leve do Flash, ainda mais rápida</li>
+                    <li><strong>Gemini 2.0/1.5:</strong> Modelos anteriores, ainda funcionais</li>
+                </ul>
+            </div>
+
+            <button id="saveButton" class="button">Salvar Configurações</button>
+
+            <div id="message"></div>
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">Como Usar</h3>
+            <ol style="line-height: 1.6;">
+                <li>Configure sua chave da API acima</li>
+                <li>Selecione o modelo desejado</li>
+                <li>Clique em "Salvar Configurações"</li>
+                <li>Agora você pode usar a extensão em qualquer página:
+                    <ul style="margin-left: 20px; margin-top: 8px;">
+                        <li>Selecione qualquer texto</li>
+                        <li>Clique com botão direito</li>
+                        <li>Vá em "AI Assistant" e escolha uma ação</li>
+                        <li>Veja o resultado na sidebar lateral</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <script src="options.js"></script>
+</body>
+</html>
